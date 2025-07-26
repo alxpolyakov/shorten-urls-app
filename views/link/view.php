@@ -1,4 +1,6 @@
 <?php
+use yii\helpers\Url;
+
 ?>
 <?php if (Yii::$app->session->hasFlash('errors')){
     foreach (Yii::$app->session->getFlash('errors') as $error) {
@@ -32,6 +34,9 @@
         <img src="<?php echo $item->getQRCode(); ?>">
     </div>
     <div class="col-10">
+        <p>Short link is: <a href="<?php echo Url::to(['link/hit', 'short_url'=>$item->short_url], true) ?>">
+                <?php echo Url::to(['link/hit', 'short_url'=>$item->short_url], true) ?></a>
+        </p>
         <p>This short link's target is: <a href="<?php echo $item->long_url; ?>"><?php echo $item->long_url; ?></a></p>
         <p>Created at: <?php echo date( 'Y-m-d H:i:s', strtotime($item->created_at)); ?></p>
         <p>Hits count: <?php echo $item->hits_count ?></p>

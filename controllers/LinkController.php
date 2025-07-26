@@ -30,13 +30,13 @@ class LinkController extends \yii\web\Controller
             $errors = [];
             if (!filter_var($longURL, FILTER_VALIDATE_URL)) {
                 $errors[] = 'Incorrect URL';
-                return $this->render('url/create', ['errors'=>$errors]);
+                return $this->render('link/create', ['errors'=>$errors]);
             }
 
             $segments = parse_url($longURL);
             if(gethostbyname($segments['host']) === $segments['host']){
                 $errors[] = 'Cannot resolve host name';
-                return $this->render('url/create', ['errors'=>$errors]);
+                return $this->render('link/create', ['errors'=>$errors]);
             }
             do{
                 $short = Link::generateShortCode();
@@ -56,6 +56,15 @@ class LinkController extends \yii\web\Controller
             }
             curl_close($ch);
 
+            /*
+             * URL maybe temporally unavailable...
+             * >>> Доступность данного ресурса (если не доступен выводим: Данный URL не доступен)
+            */
+            if($code === 0) {
+                $errors[] = 'URL is not available';
+                return $this->render('link/create', ['errors'=>$errors]);
+            }
+
 
             $data = [
                 'long_url' =>$longURL,
@@ -70,7 +79,7 @@ class LinkController extends \yii\web\Controller
             }
 
             $item->save(true, array_keys($data));
-            return $this->redirect(Url::to(['url/view', 'short_url'=>$item->short_url]));
+            return $this->redirect(Url::to(['link/view', 'short_url'=>$item->short_url]));
         }
         return $this->render('create');
     }
